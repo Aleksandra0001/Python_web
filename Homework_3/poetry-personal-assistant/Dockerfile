@@ -1,10 +1,12 @@
-FROM python:3
+FROM python:3.10
 
-WORKDIR /usr/src/app
+ENV POETRY_VERSION=1.1.14
+RUN python3 -m pip install poetry==$POETRY_VERSION
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY poetry.lock pyproject.toml ./
+RUN poetry config virtualenvs.in-project true --local
+RUN poetry install --no-dev
 
 COPY . .
-
-CMD [ "python", "./your-daemon-or-script.py" ]
+SHELL ["powershell", "-command"]
+CMD ["poetry", "run", "start"]

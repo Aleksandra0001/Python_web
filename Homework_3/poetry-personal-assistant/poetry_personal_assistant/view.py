@@ -1,13 +1,12 @@
-import sys
 import os
 from datetime import datetime
 
-from pick import pick
 from difflib import get_close_matches
-from .sorter import start
+from pick import pick
 
-from styles import show_records, show_notes, show_print, bcolors, pretty_title
-from classes import Record, SomeBook, Name, Phone, Address, Email, Birthday, NoteBookRecord, NoteBookText, NoteBookTeg
+from .sorter import start
+from .styles import show_records, show_notes, show_print, bcolors, pretty_title
+from .classes import Record, SomeBook, Name, Phone, Address, Email, Birthday, NoteBookRecord, NoteBookText, NoteBookTeg
 
 
 addressbook = SomeBook('data.bin')
@@ -65,11 +64,13 @@ def sorter_submenu_switcher(index):
 
 def sorter_handler(index):
     if index == 0:
-        start()
         print('For sorted files, please choose a folder to sort.')
+        start()
     if index == 1:
         show_menu()
         print('Back to menu')
+    # if index == 2:
+    #     print("Здесь функция которая обрабатывает Option 3")
 
 
 # ============================= Main Menu =================+++++++=================================
@@ -107,11 +108,8 @@ def menu_switcher(index):
         pretty_title(f"Welcome to Folder Sorter.\n{'=' * 60}")
         show_sorter_submenu()
         command = input("Write your command: ").casefold().strip()
-        if command in back_to_menu_commands:
-            show_menu()
-        else:
-            while sorter_handler(command):
-                command = input("Write your command: ").casefold().strip()
+        while sorter_handler(command):
+            command = input("Write your command: ").casefold().strip()
     if index == 4:
         print(f"{bcolors.HEADER}See you later!{bcolors.ENDC}")
         addressbook.save_data()
@@ -201,17 +199,9 @@ def contacts_handler(command):
             address = input("Enter address: ").strip()
             email = input("Enter email: ").strip()
             birthday = input("Enter birthday dd-mm-yyyy: ").strip()
-            address_new = None
-            if address:
-                address_new = Address(address)
-            email_new = None
-            if email:
-                email_new = Email(email)
-            record = Record(Name(name), Phone(phone_number), address_new, email_new)
-            if birthday:
-                record.add_birthday(Birthday(birthday))
+            record = Record(Name(name), Phone(phone_number), Address(address), Email(email))
+            record.add_birthday(Birthday(birthday))
             addressbook.add_record(record)
-            print(f"{bcolors.OKGREEN}Contact added successfully{bcolors.ENDC}")
             addressbook.save_data()
             return True
         except ValueError as e:
@@ -231,12 +221,12 @@ def contacts_handler(command):
         return True
     if command in days_to_birthday_commands or command == 4:
         period = input("Enter days to birthday: ")
-        print(f"{bcolors.OKGREEN}Days to birthday: {bcolors.HEADER}{period}{bcolors.ENDC}")
+        print(f"Days to birthday {period}")
         num = 0
         try:
             num = int(period)
         except ValueError:
-            print(f'{bcolors.WARNING}Enter integer{bcolors.ENDC}')
+            print('Enter integer')
             return ''
         res = []
         for k, v in addressbook.items():
@@ -251,7 +241,7 @@ def contacts_handler(command):
             if result.days <= num:
                 res.append(v)
         print("\n".join([f"{value.name.value.title()}: {value}" for value in res]) if len(
-            res) > 0 else f'{bcolors.WARNING}Contacts not found!{bcolors.ENDC}')
+            res) > 0 else 'Contacts not found')
         return True
     if command in update_commands or command == 5:
         updated_position = show_edit_contact_submenu()
@@ -263,9 +253,8 @@ def contacts_handler(command):
                     record.name.value = new_value
                     addressbook.pop(old_value)
                     addressbook[new_value] = record
-                    print(f"{bcolors.OKGREEN}Record {bcolors.HEADER}{old_value}{bcolors.OKGREEN} was updated to {bcolors.HEADER} {new_value}{bcolors.ENDC}")
+                    print(f"Record {old_value} was updated to {new_value}")
                     return True
-            print(f"{bcolors.WARNING}Record {bcolors.HEADER}{old_value}{bcolors.WARNING} was not found{bcolors.ENDC}")
             addressbook.save_data()
             return True
         elif updated_position == 1:
@@ -275,12 +264,10 @@ def contacts_handler(command):
             if record != -1:
                 if len(record.phones) >= 1:
                     record.phones[0] = Phone(new_value)
-                    print(f"{bcolors.OKGREEN}Phone number was updated!{bcolors.ENDC}")
                 else:
                     record.phones.append(Phone(new_value))
-                    print(f"{bcolors.OKGREEN}Phone number was updated!{bcolors.ENDC}")
             else:
-                print(f'{bcolors.WARNING}Contact name {bcolors.HEADER}{name}{bcolors.WARNING} was not found!{bcolors.ENDC}')
+                print(f'Note title {name}) is not found')
             addressbook.save_data()
             return True
         elif updated_position == 2:
@@ -289,9 +276,8 @@ def contacts_handler(command):
             record = addressbook.get(name, -1)
             if record != -1:
                 record.address = Address(new_value)
-                print(f"{bcolors.OKGREEN}Contact address was updated to: {bcolors.HEADER}{new_value}{bcolors.ENDC}")
             else:
-                print(f'{bcolors.WARNING}Contact {bcolors.HEADER}{name}{bcolors.OKGREEN} was not found!{bcolors.ENDC}')
+                print(f'Note title {name} is not found')
             addressbook.save_data()
             return True
         elif updated_position == 3:
@@ -300,9 +286,8 @@ def contacts_handler(command):
             record = addressbook.get(name, -1)
             if record != -1:
                 record.email = Email(new_value)
-                print(f"{bcolors.OKGREEN}Contact email was updated to: {bcolors.HEADER} {new_value}{bcolors.ENDC}")
             else:
-                print(f'{bcolors.WARNING}Contact {bcolors.HEADER}{name}{bcolors.WARNING} was not found{bcolors.ENDC}!')
+                print(f'Note title {name} is not found')
             addressbook.save_data()
             return True
         elif updated_position == 4:
@@ -311,17 +296,15 @@ def contacts_handler(command):
             record = addressbook.get(name, -1)
             if record != -1:
                 record.birthday = Birthday(new_value)
-                print(f"{bcolors.OKGREEN}Birthday {bcolors.HEADER}{new_value}{bcolors.OKGREEN} was added to {bcolors.HEADER}{name}{bcolors.ENDC}")
             else:
-                print(f'{bcolors.WARNING}Contact {bcolors.HEADER}{name}{bcolors.WARNING} was not found{bcolors.ENDC}!')
+                print(f'Note title {name} is not found')
             addressbook.save_data()
             return True
         elif updated_position == 5:
-            show_contacts_submenu()
             addressbook.save_data()
             return True
         else:
-            print(f"{bcolors.WARNING}Wrong command{bcolors.ENDC}!")
+            print("Wrong command")
             return True
     if command in back_to_menu_commands or command == 6:
         show_menu()
@@ -330,10 +313,9 @@ def contacts_handler(command):
         show_contacts_submenu()
         return True
     if command in exit_commands or command == 8:
-        pretty_title("Goodbye!")
+        print("Goodbye!")
         addressbook.save_data()
-        sys.exit(0)
-        # return False
+        return False
     else:
         print(f"{bcolors.WARNING}Unknown command{bcolors.ENDC}")
 
@@ -358,10 +340,8 @@ def notes_handler(command):
             note = NoteBookRecord(Name(title), NoteBookText(text))
             tegs_list = teg.split(',')
             for tg in tegs_list:
-                if tg != '':
-                    note.add_teg(NoteBookTeg(tg.strip()))
+                note.add_teg(NoteBookTeg(tg.strip()))
             notebook.add_record(note)
-            print(f"{bcolors.OKGREEN}Note was added successfully!{bcolors.ENDC}")
             notebook.save_data()
             return True
         except ValueError as e:
@@ -409,9 +389,8 @@ def notes_handler(command):
                     record.name.value = new_value
                     notebook.pop(old_title)
                     notebook[new_value] = record
-                    print(f"{bcolors.OKGREEN}Record: {bcolors.HEADER}{old_title}{bcolors.OKGREEN} was updated to: {bcolors.HEADER}{new_value}{bcolors.ENDC}")
+                    print(f"Record {old_title} was updated to {new_value}")
                     return True
-            print(f"{bcolors.WARNING}Note title {bcolors.HEADER}{old_title}{bcolors.OKGREEN} was not found!{bcolors.ENDC}")
             notebook.save_data()
             return True
         if updated_position == 1:
@@ -420,7 +399,8 @@ def notes_handler(command):
             note = notebook.get(name, -1)
             if note != -1:
                 note.text = NoteBookText(new_text)
-            print(f'{bcolors.WARNING}Note title :{bcolors.HEADER}{name}{bcolors.WARNING} update successfully!{bcolors.ENDC}')
+            else:
+                print(f'Note title {name} is not found')
             notebook.save_data()
             return True
         if updated_position == 2:
@@ -429,7 +409,6 @@ def notes_handler(command):
             note = notebook.get(name, -1)
             if note != -1:
                 note.add_teg(NoteBookTeg(new_teg))
-            print(f'{bcolors.WARNING}Note title {bcolors.HEADER}{name}{bcolors.WARNING} updated successfully!{bcolors.ENDC}')
             notebook.save_data()
             return True
         if updated_position == 3:
@@ -438,11 +417,7 @@ def notes_handler(command):
             note = notebook.get(name, -1)
             if note != -1:
                 note.del_teg(new_teg)
-            print(f'{bcolors.WARNING}Note title {bcolors.HEADER}{name}{bcolors.WARNING} updated successfully!{bcolors.ENDC}')
             notebook.save_data()
-            return True
-        if updated_position == 4:
-            show_notes_submenu()
             return True
     if command in back_to_menu_commands or command == 6:
         show_menu()
@@ -451,9 +426,8 @@ def notes_handler(command):
         show_notes_submenu()
         return True
     if command in exit_commands or command == 8:
-        pretty_title("Goodbye!")
+        print("Goodbye!")
         notebook.save_data()
-        sys.exit(0)
-        # return False
+        return False
     else:
         print(f"{bcolors.WARNING}Unknown command{bcolors.ENDC}")

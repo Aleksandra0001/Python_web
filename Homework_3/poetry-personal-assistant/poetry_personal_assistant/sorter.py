@@ -1,8 +1,8 @@
 from pathlib import Path
 import shutil
 
-import file_parser as parser
-from normalize import normalize
+import poetry_personal_assistant.file_parser as parser
+from .normalize import normalize
 
 
 def handle_media(filename: Path, target_folder: Path):
@@ -40,7 +40,7 @@ def handle_folder(folder: Path):
         folder.rmdir()
     except:
         OSError
-        print(f'Не удалось удалить папку {folder}')
+        print(f'Неудалось удалить папку {folder}')
 
 
 def main(folder: Path):
