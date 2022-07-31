@@ -1,1 +1,2 @@
-pass
+def start():
+    pass
