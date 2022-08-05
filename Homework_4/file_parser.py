@@ -1,8 +1,8 @@
+import os
 import shutil
 from pathlib import Path
 from normalize import normalize
 from concurrent.futures import ThreadPoolExecutor
-
 
 JPEG_IMAGES = []
 JPG_IMAGES = []
@@ -86,39 +86,42 @@ def scan(folder: Path) -> None:
 
 def handle_media(filename: Path, target_folder: Path):
     target_folder.mkdir(exist_ok=True, parents=True)
-    filename.replace(target_folder / filename.name)
+    filename.replace(target_folder / normalize(filename.name))
 
 
 def handle_documents(filename: Path, target_folder: Path):
     target_folder.mkdir(exist_ok=True, parents=True)
-    filename.replace(target_folder / filename.name)
+    filename.replace(target_folder / normalize(filename.name))
 
 
 def handle_other(filename: Path, target_folder: Path):
     target_folder.mkdir(exist_ok=True, parents=True)
-    filename.replace(target_folder / filename.name)
+    filename.replace(target_folder / normalize(filename.name))
 
 
 def handle_archive(filename: Path, target_folder: Path):
     target_folder.mkdir(exist_ok=True, parents=True)
-    folder_for_file = target_folder / filename.name.replace(filename.suffix, '')
+    folder_for_file = target_folder / normalize(filename.name.replace(filename.suffix, ''))
 
     folder_for_file.mkdir(exist_ok=True, parents=True)
     try:
         shutil.unpack_archive(str(filename.resolve()),
                               str(folder_for_file.resolve()))
     except shutil.ReadError:
-        print(f'Обман - это не архив {filename}!')
+        print(f'It is not an archive {filename}!')
         folder_for_file.rmdir()
         return None
     filename.unlink()
 
 
 def handle_delete_folder(folder: Path):
-    try:
-        folder.rmdir()
-    except OSError:
-        print(f'Не удалось удалить папку {folder}')
+    if folder.is_dir():
+        try:
+            folder.rmdir()
+        except OSError:
+            print(f'Folder {folder} was not deleted!')
+    else:
+        print(f'{folder} is not a folder!')
 
 
 def handlers_switcher(folder: Path):
@@ -128,44 +131,44 @@ def handlers_switcher(folder: Path):
             feature.result()
 
         for file in JPEG_IMAGES:
-            features.append(executor.submit(handle_media, file, folder / 'images'/'JPEG'))
+            features.append(executor.submit(handle_media, file, folder / 'images' / 'JPEG'))
         for file in JPG_IMAGES:
-            features.append(executor.submit(handle_media, file, folder / 'images'/'JPG'))
+            features.append(executor.submit(handle_media, file, folder / 'images' / 'JPG'))
         for file in PNG_IMAGES:
-            features.append(executor.submit(handle_media, file, folder / 'images'/'PNG'))
+            features.append(executor.submit(handle_media, file, folder / 'images' / 'PNG'))
         for file in SVG_IMAGES:
-            features.append(executor.submit(handle_media, file, folder / 'images'/'SVG'))
+            features.append(executor.submit(handle_media, file, folder / 'images' / 'SVG'))
 
         for file in MP3_AUDIO:
-            features.append(executor.submit(handle_media, file, folder / 'audio'/'MP3'))
+            features.append(executor.submit(handle_media, file, folder / 'audio' / 'MP3'))
         for file in OGG_AUDIO:
-            features.append(executor.submit(handle_media, file, folder / 'audio'/'OGG'))
+            features.append(executor.submit(handle_media, file, folder / 'audio' / 'OGG'))
         for file in WAV_AUDIO:
-            features.append(executor.submit(handle_media, file, folder / 'audio'/'WAV'))
+            features.append(executor.submit(handle_media, file, folder / 'audio' / 'WAV'))
         for file in AMR_AUDIO:
-            features.append(executor.submit(handle_media, file, folder / 'audio'/'AMR'))
+            features.append(executor.submit(handle_media, file, folder / 'audio' / 'AMR'))
 
         for file in MP4_VIDEO:
-            features.append(executor.submit(handle_media, file, folder / 'video'/'MP4'))
+            features.append(executor.submit(handle_media, file, folder / 'video' / 'MP4'))
         for file in MOV_VIDEO:
-            features.append(executor.submit(handle_media, file, folder / 'video'/'MOV'))
+            features.append(executor.submit(handle_media, file, folder / 'video' / 'MOV'))
         for file in AVI_VIDEO:
-            features.append(executor.submit(handle_media, file, folder / 'video'/'AVI'))
+            features.append(executor.submit(handle_media, file, folder / 'video' / 'AVI'))
         for file in MKV_VIDEO:
-            features.append(executor.submit(handle_media, file, folder / 'video'/'MKV'))
+            features.append(executor.submit(handle_media, file, folder / 'video' / 'MKV'))
 
         for file in DOC_DOCUMENTS:
-            features.append(executor.submit(handle_documents, file, folder / 'documents'/'DOC'))
+            features.append(executor.submit(handle_documents, file, folder / 'documents' / 'DOC'))
         for file in DOCX_DOCUMENTS:
-            features.append(executor.submit(handle_documents, file, folder / 'documents'/'DOCX'))
+            features.append(executor.submit(handle_documents, file, folder / 'documents' / 'DOCX'))
         for file in TXT_DOCUMENTS:
-            features.append(executor.submit(handle_documents, file, folder / 'documents'/'TXT'))
+            features.append(executor.submit(handle_documents, file, folder / 'documents' / 'TXT'))
         for file in PDF_DOCUMENTS:
-            features.append(executor.submit(handle_documents, file, folder / 'documents'/'PDF'))
+            features.append(executor.submit(handle_documents, file, folder / 'documents' / 'PDF'))
         for file in XLSX_DOCUMENTS:
-            features.append(executor.submit(handle_documents, file, folder / 'documents'/'XLSX'))
+            features.append(executor.submit(handle_documents, file, folder / 'documents' / 'XLSX'))
         for file in PPTX_DOCUMENTS:
-            features.append(executor.submit(handle_documents, file, folder / 'documents'/'PPTX'))
+            features.append(executor.submit(handle_documents, file, folder / 'documents' / 'PPTX'))
 
         for file in OTHER:
             features.append(executor.submit(handle_other, file, folder / 'my other'))
@@ -173,6 +176,5 @@ def handlers_switcher(folder: Path):
         for file in ARCHIVES:
             features.append(executor.submit(handle_archive, file, folder / 'archives'))
 
-        for folder in FOLDERS[::-1]:
-            features.append(executor.submit(handle_delete_folder, folder))
-            handle_delete_folder(folder)
+    for folder in FOLDERS[::-1]:
+        handle_delete_folder(folder)

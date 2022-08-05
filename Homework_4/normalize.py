@@ -13,7 +13,7 @@ for c, l in zip(CYRILLIC_SYMBOLS, LATIN_SYMBOLS):
 def normalize(name: str) -> str:
     try:
         name = name.translate(TRANS)
-        name = re.sub(r'\W', '_', name)
+        name = re.sub(r'[^\w|.]', '_', name)
         return name
     except AttributeError:
         return print("data should be a string")
