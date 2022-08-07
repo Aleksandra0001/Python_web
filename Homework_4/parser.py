@@ -7,23 +7,31 @@ from random import random
 
 
 def folder_parse(source_folder: Path, output_folder: Path) -> None:
-    for item in source_folder.iterdir():
-        if item.is_dir():
-            folder_parse(item, output_folder)
-        else:
-            copy_file(item, output_folder)
-    handle_delete_folder(source_folder)
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = []
+        for future in futures:
+            print(future.result())
+
+        for item in source_folder.iterdir():
+            if item.is_dir():
+                futures.append(executor.submit(folder_parse, item, output_folder))
+            else:
+                futures.append(executor.submit(copy_file, item, output_folder))
+
+    if output_folder != source_folder:
+        handle_delete_folder(source_folder)
 
 
 def copy_file(file: Path, output_folder: Path) -> None:
+    file_folder = file.suffix[1:].upper()
     if file.suffix in ('.jpeg', '.jpg', '.png', '.svg'):
-        return handle_media(file, output_folder / 'Images')
+        return handle_media(file, output_folder / 'Images' / file_folder)
     if file.suffix in ('.mp3', '.ogg', '.wav', '.amr'):
-        return handle_media(file, output_folder / 'Audio')
+        return handle_media(file, output_folder / 'Audio' / file_folder)
     if file.suffix in ('.mp4', '.avi', '.mkv', '.mov'):
-        return handle_media(file, output_folder / 'Video')
+        return handle_media(file, output_folder / 'Video' / file_folder)
     if file.suffix in ('.pdf', '.doc', '.docx', '.xlsx', '.txt', '.pptx', '.xml'):
-        return handle_documents(file, output_folder / 'Documents')
+        return handle_documents(file, output_folder / 'Documents' / file_folder)
     if file.suffix in ('.zip', '.tar', '.gz'):
         return handle_archive(file, output_folder / 'Archives')
     else:
@@ -31,7 +39,6 @@ def copy_file(file: Path, output_folder: Path) -> None:
 
 
 def handle_media(filename: Path, target_folder: Path):
-    # print(f'Перемещаю {filename} в {target_folder}')
     target_folder.mkdir(exist_ok=True, parents=True)
     filename.replace(target_folder / normalize(filename.name))
 
