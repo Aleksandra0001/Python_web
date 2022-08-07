@@ -1,5 +1,5 @@
 from pathlib import Path
-import file_parser as parser
+import parser as parser
 
 
 def start():
@@ -12,9 +12,9 @@ def start():
         start()
     else:
         folder_path = Path(path)
-        folder = folder_path.resolve()
-        parser.scan(folder)
-        parser.handlers_switcher(folder)
+        source_folder = folder_path.resolve()
+        output_folder = folder_path.resolve()
+        parser.folder_parse(source_folder, output_folder)
         print('Done!')
 
 
