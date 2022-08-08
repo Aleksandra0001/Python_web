@@ -1,3 +1,6 @@
+from time import time
+import concurrent.futures
+
 def factorize(*numbers):
     dividers = []
     try:
@@ -20,5 +23,8 @@ if __name__ == '__main__':
     assert c == [1, 3, 9, 41, 123, 271, 369, 813, 2439, 11111, 33333, 99999]
     assert d == [1, 2, 4, 5, 7, 10, 14, 20, 28, 35, 70, 140, 76079, 152158, 304316, 380395, 532553, 760790, 1065106,
                  1521580, 2130212, 2662765, 5325530, 10651060]
-    # print(factorize())
+    time = time()
+    print(time)
+    with concurrent.futures.ProcessPoolExecutor(4) as executor:
+        future = executor.submit(factorize,128, 255, 99999, 10651060)
     print('Done!')
