@@ -1,23 +1,24 @@
-import parser as parser
+import asyncio
+from parser import folder_parse
 from aiopath import AsyncPath
+from time import time
 
 
 async def start():
     path = input("Enter path to folder: ").strip()
-    print(f'You entered {type(path)}')
     folder = AsyncPath(path)
     if await folder.exists() and len(path) > 0:
         try:
-            await parser.folder_parse(folder, folder)
+            start_time = time()
+            await folder_parse(folder, folder)
             print("Done!")
+            print(f'Time: {time() - start_time}')
         except Exception as e:
-            print(f"Error: {e}")
+            print(f'Error: {e}')
     else:
         print("Folder not found. Please, try again.")
         await start()
 
 
 if __name__ == '__main__':
-    import asyncio
-
     asyncio.run(start())
