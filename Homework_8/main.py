@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, choice
 
 import psycopg2
 from contextlib import contextmanager
@@ -10,11 +10,10 @@ fake = Faker()
 
 @contextmanager
 def create_connection():
-    """ create a database connection to a SQLite database """
     conn = None
     try:
-        conn = psycopg2.connect(host='localhost', database='test', user='postgres', password='2902')
-        print(conn)
+        conn = psycopg2.connect(host='localhost', database='university', user='postgres', password='password')
+        print('Connected!')
         yield conn
         conn.commit()
     except Error as e:
@@ -24,70 +23,82 @@ def create_connection():
         conn.close()
 
 
-def create_table(conn, create_table_sql):
-    try:
-        c = conn.cursor()
-        c.execute(create_table_sql)
-    except Error as e:
-        print(e)
+def create_table():
+    with create_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute('''CREATE TABLE IF NOT EXISTS class (
+                            id SERIAL PRIMARY KEY,
+                            class_name VARCHAR(30) NOT NULL)''')
+
+            cur.execute('''CREATE TABLE IF NOT EXISTS student (
+                            id SERIAL PRIMARY KEY,
+                            name VARCHAR(30) NOT NULL,
+                            class_id INTEGER REFERENCES class(id))''')
+
+            cur.execute('''CREATE TABLE IF NOT EXISTS mentor (
+                            id SERIAL PRIMARY KEY,
+                            name VARCHAR(30) NOT NULL)''')
+
+            cur.execute('''CREATE TABLE IF NOT EXISTS subject (
+                            id SERIAL PRIMARY KEY,
+                            subject_name VARCHAR(30) NOT NULL,
+                            mentor_id INTEGER REFERENCES mentor(id))''')
+
+            cur.execute('''CREATE TABLE IF NOT EXISTS mark (
+                            id SERIAL PRIMARY KEY,
+                            mark INTEGER NOT NULL,
+                            data_of_mark date NOT NULL,
+                            student_id INTEGER REFERENCES student(id),
+                            subject_id INTEGER REFERENCES subject(id))''')
+        conn.commit()
+
+
+def insert_data():
+    with create_connection() as conn:
+        with conn.cursor() as cursor:
+            for i in range(3):
+                cursor.execute(
+                    "INSERT INTO class (class_name) VALUES (%s)", (fake.bothify(text='Class: ??-##', letters='ABCDE'),))
+
+            cursor.execute("SELECT id FROM class")
+            class_ids = cursor.fetchall()
+            conn.commit()
+
+            for i in range(30):
+                cursor.execute(
+                    "INSERT INTO student (name, class_id) VALUES (%s, %s)",
+                    (fake.name(), choice(class_ids),))
+
+            for i in range(3):
+                cursor.execute(
+                    "INSERT INTO mentor (name) VALUES (%s)", (fake.name(),))
+
+            cursor.execute("SELECT id FROM mentor")
+            mentor_ids = cursor.fetchall()
+            conn.commit()
+
+            for subject in ['Math', 'Physics', 'Chemistry', 'Biology', 'History']:
+                cursor.execute(
+                    "INSERT INTO subject (subject_name, mentor_id) VALUES (%s, %s)",
+                    (subject, choice(mentor_ids),))
+
+            cursor.execute("SELECT id FROM subject")
+            subject_ids = cursor.fetchall()
+            conn.commit()
+
+            cursor.execute("SELECT id FROM student")
+            student_ids = cursor.fetchall()
+            conn.commit()
+
+            for student in student_ids:
+                for subject in subject_ids:
+                    for i in range(20):
+                        cursor.execute(
+                            "INSERT INTO mark (mark, data_of_mark, student_id, subject_id) VALUES (%s, %s, %s, %s)",
+                            (randint(1, 12), fake.date_this_year(), student[0], subject[0],))
 
 
 if __name__ == '__main__':
-    sql_create_students_table = """CREATE TABLE IF NOT EXISTS students (
-     id serial PRIMARY KEY,
-     name VARCHAR(30)
-    );"""
-    sql_create_group_table = """CREATE TABLE IF NOT EXISTS "group" (
-        id SERIAL PRIMARY KEY,
-        "group"(name) VARCHAR(60),
-        students INTEGER REFERENCES users(id)
-    );"""
-    sql_create_courses_table = """CREATE TABLE IF NOT EXISTS course (
-        id SERIAL PRIMARY KEY,
-        course_name VARCHAR(150),
-        group INTEGER REFERENCES users(id)
-    );"""
-    sql_create_mentor_table = """CREATE TABLE IF NOT EXISTS mentor (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(30) NOT NULL
-        course INTEGER REFERENCES courses(id)
-        );"""
-    sql_create_mark_table = """CREATE TABLE IF NOT EXISTS mark (
-    id SERIAL PRIMARY KEY,
-    mark numeric CHECK (mark > 1 AND mark < 5),
-    data_of_mark date,
-    student INTEGER REFERENCES users(id),
-    course INTEGER REFERENCES courses(id),
-    mentor INTEGER REFERENCES students_courses(id)
-    );"""
-    with create_connection() as conn:
-        if conn is not None:
-            create_table(conn, sql_create_students_table)
-        else:
-            print('Error: can\'t create the database connection')
-
-    sql_insert_students_table = "INSERT INTO students(name) VALUES(%s)"
-    sql_insert_group_table = "INSERT INTO group(name) VALUES(%s)"
-    sql_insert_courses_table = "INSERT INTO course(course_name, group(name)) VALUES(%s, %s)"
-    sql_insert_mentor_table = "INSERT INTO mentor(name, course) VALUES(%s, %s)"
-    sql_insert_mark_table = "INSERT INTO mark(mark, data_of_mark, student, course, mentor) VALUES(%s, %s, %s, %s, %s) "
-
-    with create_connection() as conn:
-        if conn is not None:
-            cur = conn.cursor()
-            for _ in range(30):
-                pass
-                # ========var1======
-                # cur.execute(sql_insert_students_table, (fake.name()), sql_insert_group_table,
-                #             (fake.group()), sql_insert_courses_table, (fake.course_name(), fake.group()),
-                #             sql_insert_mentor_table, (fake.name(), fake.course_name()),
-                #             sql_insert_mark_table, (randint(1, 5), fake.date(), fake.name(), fake.course_name(), fake.name()))
-            # ========var2======
-                # cur.execute(sql_insert_students_table, (fake.name()))
-                # cur.execute(sql_insert_group_table, (fake.group()))
-                # cur.execute(sql_insert_courses_table, (fake.course_name(), fake.group()))
-                # cur.execute(sql_insert_mentor_table, (fake.name(), fake.course_name()))
-                # cur.execute(sql_insert_mark_table, (randint(1, 5), fake.date(), fake.name(), fake.course_name(), fake.name()))
-            cur.close()
-        else:
-            print('Error: can\'t create the database connection')
+    # create_table()
+    # insert_data()
+    print('Table created!')
