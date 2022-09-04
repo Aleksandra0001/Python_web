@@ -1,26 +1,12 @@
 from random import randint, choice
-
-import psycopg2
-from contextlib import contextmanager
-from sqlite3 import Error
 from faker import Faker
+from connection import create_connection
+from requests import get_students_with_max_avg_score, get_student_with_max_avg_score_by_subject, get_avg_score_in_class, \
+    get_avg_score_by_subject_in_class, get_subjects_by_mentor, get_students_by_class, get_marks_by_class_and_subject, \
+    get_marks_by_class_and_subject_on_last_lesson, get_subjects_by_student, get_subjects_by_student_and_mentor, \
+    get_avg_score_by_student_and_mentor, get_avg_score_by_mentor
 
 fake = Faker()
-
-
-@contextmanager
-def create_connection():
-    conn = None
-    try:
-        conn = psycopg2.connect(host='localhost', database='university', user='postgres', password='password')
-        print('Connected!')
-        yield conn
-        conn.commit()
-    except Error as e:
-        print(e)
-        conn.rollback()
-    finally:
-        conn.close()
 
 
 def create_table():
@@ -100,5 +86,17 @@ def insert_data():
 
 if __name__ == '__main__':
     # create_table()
-    # insert_data()
     print('Table created!')
+    # insert_data()
+    # print(get_students_with_max_avg_score())
+    # print(get_student_with_max_avg_score_by_subject(1))
+    # print(get_avg_score_by_subject_in_class(1))
+    # print(get_avg_score_in_class())
+    # print(get_subjects_by_mentor(1))
+    # print(get_students_by_class(1))
+    # print(get_marks_by_class_and_subject(1,1))
+    # print(get_marks_by_class_and_subject_on_last_lesson(1, 1))
+    # print(get_subjects_by_student(1))
+    # print(get_subjects_by_student_and_mentor(1,1))
+    # print(get_avg_score_by_student_and_mentor(1,1))
+    # print(get_avg_score_by_mentor(1))
