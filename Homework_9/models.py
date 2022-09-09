@@ -1,17 +1,14 @@
-from datetime import datetime
-
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql.schema import ForeignKey, Table
+from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.sql.sqltypes import DateTime
 
+engine = create_engine('sqlite:///sqlalchemy_example.db')
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
+
 Base = declarative_base()
-
-
-@property
-def full_name(self):
-    return f'{self.name} {self.surname}'
 
 
 class Contact(Base):
