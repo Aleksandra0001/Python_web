@@ -47,6 +47,7 @@ def main():
     fake_data = input('Do you want to generate fake contacts? (y/n): ')
     if fake_data == 'y':
         generate_fake_contacts()
+        menu()
     else:
         phrases('Ok, no fake data')
         menu()
