@@ -1,39 +1,39 @@
-from datetime import datetime
-
-from sqlalchemy import Column, Integer, String, Boolean
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql.schema import ForeignKey, Table
-from sqlalchemy.sql.sqltypes import DateTime
-from db import Base
-
-note_m2m_tag = Table(
-    "note_m2m_tag",
-    Base.metadata,
-    Column("id", Integer, primary_key=True),
-    Column("note", Integer, ForeignKey("notes.id")),
-    Column("tag", Integer, ForeignKey("tags.id")),
+from sqlalchemy import (
+    ForeignKey,
+    Column,
+    Integer, String, Date,
+    DateTime,
+    Table,
 )
+from sqlalchemy.orm import relationship
+
+from db import Base, metadata
 
 
 class Contact(Base):
-    __tablename__ = "contacts"
-    id = Column(Integer, primary_key=True)
-    name = Column("Contact", String(50), nullable=False)
-    phone = Column("Phone-number", String(13), nullable=False, unique=True)
-    email = Column("Email", String(50), nullable=False, unique=True)
-    birthday = Column("Birthday", DateTime)
+    __tablename__ = 'contacts'
+    contact_id = Column('contact_id', Integer, primary_key=True)
+    first_name = Column('first_name', String(50), nullable=True)
+    last_name = Column('last_name', String(50), nullable=True)
+    phone = relationship("Phone", back_populates="contact")
+    email = relationship("Email", back_populates="contact")
+
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
 
 
-class Note(Base):
-    __tablename__ = "notes"
-    id = Column(Integer, primary_key=True)
-    title = Column(String(30), nullable=False, unique=True)
-    created = Column(DateTime, default=datetime.now())
-    records = relationship("Record", cascade="all, delete", backref="note")
-    tags = relationship("Tag", secondary=note_m2m_tag, backref="notes")
+class Phone(Base):
+    __tablename__ = 'phones'
+    phone_id = Column('phone_id', Integer, primary_key=True)
+    phone = Column('phone', String(50), nullable=True)
+    contact_id = Column('contact_id', Integer, ForeignKey('contacts.contact_id'))
+    contact = relationship("Contact", back_populates="phone")
 
 
-class Tag(Base):
-    __tablename__ = "tags"
-    id = Column(Integer, primary_key=True)
-    title = Column(String(25), nullable=False, unique=True)
+class Email(Base):
+    __tablename__ = 'emails'
+    email_id = Column('email_id', Integer, primary_key=True)
+    email = Column('email', String(50), nullable=True)
+    contact_id = Column('contact_id', Integer, ForeignKey('contacts.contact_id'))
+    contact = relationship("Contact", back_populates="email")
