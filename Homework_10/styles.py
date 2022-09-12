@@ -29,5 +29,6 @@ def error(text):
 def option(text):
     return print(colored(text, color='yellow'))
 
-def phrases(text):
+
+def message(text):
     return print(colored(text, color='green'))
