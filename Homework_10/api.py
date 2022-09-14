@@ -33,7 +33,7 @@ def add_email(contact_id, email):
     contact = Contact.objects.get(id=ObjectId(contact_id))
     contact_email = contact.email
     if contact_email == email:
-        error('This email already exists!')
+        warning('This email already exists!')
     else:
         contact.email = email
         contact.save()

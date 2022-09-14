@@ -22,7 +22,7 @@ def pretty_title(text):
     return print(colored(text, color='blue'))
 
 
-def error(text):
+def warning(text):
     return print(colored(text, color='red'))
 
 

@@ -16,7 +16,7 @@ def menu():
             first_name = input('Enter first name: ').strip()
             last_name = input('Enter last name: ').strip()
             if not first_name or not last_name:
-                error('Please,enter first name and last name!')
+                warning('Please,enter first name and last name!')
                 first_name = input('Enter first name: ').strip()
                 last_name = input('Enter last name: ').strip()
             phone = input('Enter phone: ').strip()
@@ -39,7 +39,7 @@ def menu():
         elif choice == '6':
             break
         else:
-            error('Wrong choice! Try again')
+            warning('Wrong choice! Try again')
 
 
 def main():
@@ -47,7 +47,8 @@ def main():
     fake_data = input('Do you want to generate fake contacts? (y/n): ')
     if fake_data == 'y':
         generate_fake_contacts()
+        message('Fake contacts generated successfully!')
         menu()
     else:
-        message('Ok, no fake data')
+        message('Ok, no fake data!')
         menu()
