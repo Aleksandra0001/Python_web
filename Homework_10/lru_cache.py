@@ -1,39 +1,34 @@
-from collections import deque
-from functools import lru_cache
+import json
+
+from functools import wraps
+from redis import StrictRedis
+import redis
+
+client = redis.StrictRedis(host="localhost", port=6379, password=None)
+print(client.info())
+
+redis = StrictRedis()
 
 
-class LruCache:
-    def __init__(self, maxsize=100, typed=False):
-        self.maxsize = maxsize
-        self.typed = typed
-        self.cache = {}
-        self.queue = deque()
+def redis_cache(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # собираем ключ из аргументов ф-и.
+        key_parts = [func.__name__] + list(args)
+        key = '-'.join(key_parts)
+        result = redis.get(key)
 
-    def __call__(self, user_function):
-        def wrapper(*args, **kwargs):
-            key = args
-            if self.typed:
-                key += tuple([type(arg) for arg in args])
-            key += tuple(kwargs.items())
-            if key in self.cache:
-                self.queue.remove(key)
-                self.queue.append(key)
-                return self.cache[key]
-            else:
-                if len(self.cache) == self.maxsize:
-                    del self.cache[self.queue.popleft()]
-                self.cache[key] = user_function(*args, **kwargs)
-                self.queue.append(key)
-                return self.cache[key]
+        if result is None:
+            # ничего не нашли в кэше – дергаем ф-ю и сохраняем результат.
+            value = func(*args, **kwargs)
+            value_json = json.dumps(value)
+            redis.set(key, value_json)
+        else:
+            # Ура, данные есть в кэше – используем их.
+            value_json = result.decode('utf-8')
+            value = json.loads(value_json)
 
-        return wrapper
+        return value
 
+    return wrapper
 
-@lru_cache()
-def foo(x):
-    return x
-
-
-def lruCache(maxsize=100, typed=False):
-    queue = deque()
-    return "".join((str(ch) for ch in queue))

@@ -1,8 +1,16 @@
 from bson import ObjectId
 from faker import Faker
+
+from Homework_10.lru_cache import redis_cache
 from models import Contact
 from random import randint
 from styles import *
+
+# import redis
+# from functools import lru_cache
+
+# client = redis.StrictRedis(host="localhost", port=6379, password=None)
+# print(client.info())
 
 fake = Faker('uk_UA')
 
@@ -40,6 +48,7 @@ def add_email(contact_id, email):
         message('Email added successfully!')
 
 
+@redis_cache
 def get_contact_by_id(contact_id):
     contact = Contact.objects.get(id=ObjectId(contact_id))
     return print(contact.first_name, contact.last_name, contact.phone, contact.email)
