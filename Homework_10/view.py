@@ -1,14 +1,7 @@
-from Homework_10.api import generate_fake_contacts, add_phone, add_email, get_contact_by_id, add_contact, delete_contact
+from Homework_10.repository import generate_fake_contacts, add_phone, add_email, get_contact_by_id, add_contact, delete_contact
 from styles import *
 import timeit
-# import redis
-# import timeit
-# from redis_lru import RedisLRU
-#
-# client = redis.StrictRedis(host="localhost", port=6379, password=None)
-# print(client.info())
-#
-# cache = RedisLRU(client)
+
 
 
 def menu():

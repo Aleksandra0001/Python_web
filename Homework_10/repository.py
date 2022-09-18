@@ -1,16 +1,11 @@
 from bson import ObjectId
 from faker import Faker
+from mongoengine import DoesNotExist
 
-from Homework_10.lru_cache import redis_cache
+from lru_cache import cache, LruCache
 from models import Contact
 from random import randint
 from styles import *
-
-# import redis
-# from functools import lru_cache
-
-# client = redis.StrictRedis(host="localhost", port=6379, password=None)
-# print(client.info())
 
 fake = Faker('uk_UA')
 
@@ -48,10 +43,20 @@ def add_email(contact_id, email):
         message('Email added successfully!')
 
 
-@redis_cache
+@LruCache
 def get_contact_by_id(contact_id):
-    contact = Contact.objects.get(id=ObjectId(contact_id))
-    return print(contact.first_name, contact.last_name, contact.phone, contact.email)
+    try:
+        contact = Contact.objects.get(id=ObjectId(contact_id))
+        contact_cache_value = {
+            'first_name': contact.first_name,
+            'last_name': contact.last_name,
+            'email': contact.email,
+            'phone': contact.phone
+        }
+        return contact_cache_value
+    except DoesNotExist:
+        warning('Contact does not exist!')
+
 
 
 def delete_contact(contact_id):

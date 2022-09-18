@@ -7,13 +7,6 @@ import timeit
 client = redis.StrictRedis(host="localhost", port=6379, password=None)
 cache = RedisLRU(client)
 
-@lru_cache(maxsize=None)
-def fib(n):
-    if n < 2:
-        return n
-    return fib(n-1) + fib(n-2)
-
-
 
 def factorial(n):
     if n == 0:
@@ -22,6 +15,7 @@ def factorial(n):
         return n * factorial(n - 1)
 
 
+@lru_cache(maxsize=None)
 def factorial_cache(n):
     if n == 0:
         return 1
@@ -44,8 +38,14 @@ def fibonacci(n):
         return result
 
 
+@lru_cache(maxsize=None)
+def fib(n):
+    if n < 2:
+        return n
+    return fib(n - 1) + fib(n - 2)
+
+
 if __name__ == "__main__":
-    pass
     # print([fib(n) for n in range(5)])
     # print(fib(5))
     # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610]
@@ -53,13 +53,14 @@ if __name__ == "__main__":
     # print(fib.cache_info())
     # CacheInfo(hits=28, misses=16, maxsize=None, currsize=16)
 
-    # start_time = timeit.default_timer()
-    # # factorial(100)
-    # fibonacci(5)
-    # end_time = timeit.default_timer() - start_time
-    # # print(f"Time without cache: {end_time}")
-    #
-    # start_time = timeit.default_timer()
-    # # factorial_cache(100)
-    # end_time = timeit.default_timer() - start_time
-    # # print(f"Time with cache: {end_time}")
+    start_time = timeit.default_timer()
+    factorial(100)
+    # fibonacci(100)
+    end_time = timeit.default_timer() - start_time
+    print(f"Time without cache: {end_time}")
+
+    start_time = timeit.default_timer()
+    factorial_cache(100)
+    # fibonacci(100)
+    end_time = timeit.default_timer() - start_time
+    print(f"Time with cache: {end_time}")

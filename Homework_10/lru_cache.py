@@ -1,34 +1,43 @@
 import json
 
-from functools import wraps
-from redis import StrictRedis
-import redis
+from tabulate import tabulate
 
-client = redis.StrictRedis(host="localhost", port=6379, password=None)
-print(client.info())
+from redis_client import redis_client
+from redis_lru import RedisLRU
 
-redis = StrictRedis()
+cache = RedisLRU(redis_client)
+redis_client.flushdb()
 
 
-def redis_cache(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        # собираем ключ из аргументов ф-и.
-        key_parts = [func.__name__] + list(args)
-        key = '-'.join(key_parts)
-        result = redis.get(key)
+def show_cache():
+    for key in redis_client.scan_iter():
+        print('Key:', key)
+        print('Value:', redis_client.get(key))
 
-        if result is None:
-            # ничего не нашли в кэше – дергаем ф-ю и сохраняем результат.
-            value = func(*args, **kwargs)
-            value_json = json.dumps(value)
-            redis.set(key, value_json)
-        else:
-            # Ура, данные есть в кэше – используем их.
-            value_json = result.decode('utf-8')
+
+def print_data(value):
+    table_data = [
+        ['First name', 'Last name', 'Email', 'Phone'],
+        [value["first_name"], value["last_name"], value["email"], value["phone"]]
+    ]
+    print(tabulate(table_data, headers='firstrow', tablefmt='grid'))
+
+
+class LruCache:
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        key = args[0]
+        if cache.get(key) is not None:
+            value_json = cache.get(key)
             value = json.loads(value_json)
+            print_data(value)
+            show_cache()
 
-        return value
-
-    return wrapper
-
+        else:
+            value = self.func(*args, **kwargs)
+            value_json = json.dumps(value)
+            cache.set(key, value_json)
+            print_data(value)
+            show_cache()
