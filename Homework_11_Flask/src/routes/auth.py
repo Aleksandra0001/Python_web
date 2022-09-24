@@ -1,23 +1,18 @@
-from flask import render_template
+from flask import render_template, Blueprint
 
-from src import app
-
-
-@app.route('/hi')
-def index():
-    return 'Im alive!'
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
-@app.route('/')
+@auth_bp.route('/')
 def base():
     return render_template('base.html')
 
 
-@app.route('/register')
+@auth_bp.route('/register')
 def register():
     return render_template('auth/register.html')
 
 
-@app.route('/login')
+@auth_bp.route('/login')
 def login():
     return render_template('auth/login.html')

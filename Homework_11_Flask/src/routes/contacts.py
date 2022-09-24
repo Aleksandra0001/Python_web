@@ -1,12 +1,13 @@
-from flask import Flask, render_template
-from src import app
+from flask import Flask, render_template, Blueprint
+
+contacts_bp = Blueprint('contacts', __name__, url_prefix='/contacts')
 
 
-@app.route('/todo')
+@contacts_bp.route('/contacts')
 def contacts():
     return 'This is the contacts page'
 
 
-@app.route('/todo/create')
+@contacts_bp.route('/contacts/create')
 def create():
     return 'Create a new todo'
