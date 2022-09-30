@@ -37,3 +37,6 @@ input[type=submit] { align-self: start; min-width: 10em; }
   color: white;
   border: 2px solid #4CAF50; /* Blue */
 }
+.title {
+    text-align: center;
+}

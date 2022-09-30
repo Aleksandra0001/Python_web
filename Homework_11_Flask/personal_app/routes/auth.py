@@ -16,8 +16,9 @@ def register():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
-        users.create_user(username,email,password)
+        users.create_user(username, email, password)
         return redirect(url_for('auth.login'))
+
     return render_template('auth/register.html')
 
 
@@ -27,14 +28,18 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
         remember = True if request.form.get('remember') == 'on' else False
-        user = users.login(email,password)
+        user = users.login(email, password)
+
         if user is None:
             return redirect(url_for('auth.register'))
+
         session['username'] = {'username': user.username, 'id': user.id}
-        response = make_response(redirect(url_for('index')))
+        response = make_response(redirect(url_for('contacts.contacts')))
+
         if remember:
             pass
         return response
+
     return render_template('auth/login.html')
 
 

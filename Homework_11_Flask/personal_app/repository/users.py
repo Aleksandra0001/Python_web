@@ -16,3 +16,15 @@ def login(email, password):
         if bcrypt.checkpw(password.encode('utf-8'), user.hash):
             return user
     return None
+
+
+def set_token(user, token):
+    user.token_cookie = token
+    db.session.commit()
+
+
+def get_user_by_token(token):
+    user = db.session.query(User).filter(User.token_cookie == token).first()
+    if not user:
+        return None
+    return user

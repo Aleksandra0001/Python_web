@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block header %}
+<h1 class="title">Phonebook</h1>
+{% endblock %}
+{% block content %}
+<br>
+<div class="">
+    <div class="">
+        <form action="{{ url_for('contacts.contacts') }}" method="post">
+            <div class="form-group mr-3 mb-0">
+<!--                <input-->
+<!--                        type="text"-->
+<!--                        class="form-control"-->
+<!--                        id="task"-->
+<!--                        name="task"-->
+<!--                        placeholder="Enter a task here"-->
+<!--                        value="{{ request.form['task'] }}"-->
+<!--                        required-->
+<!--                />-->
+                <input type="text" class="form-control" id="name" name="name" placeholder="Enter a name here" required>
+                <input type="text" class="form-control" id="surname" name="surname" placeholder="Enter a surname here" required>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter a email here" required>
+                <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter a phone here" >
+
+            </div>
+            <button
+                    type="button submit"
+                    class="buttonsave btn btn-primary mr-3"
+            >
+                Save
+            </button>
+        </form>
+    </div>
+
+    {{ g.username }}
+    <div class="table-wrapper">
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr>
+                <th>ID.</th>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Email</th>
+                <th>Phone</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for contact in contacts %}
+            <tr class="">
+                <td>{{ contact['contact_id'] }}</td>
+                <td class="">
+                    {{ contact['first_name'] }}
+                </td>
+                <td>{{ contact['last_name']}}</td>
+                <td>{{ contact['email']}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
