@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, redirect, url_for
 from personal_app.routes import auth, contacts
 from config import config
 from flask_migrate import Migrate
@@ -26,7 +26,7 @@ def create_app():
 
     @app.route('/')
     def index():
-        return 'Im alive!'
+        return redirect(url_for('contacts.contacts'))
 
     return app
 

@@ -14,13 +14,12 @@
 <nav>
   <h1>Personal Assistant</h1>
   <ul>
-    {% if g.user %}
-    <li><span>{{ g.user['username'] }}</span>
-    <li><a href="{{ url_for('auth.base') }}">Log Out</a>
-      {% else %}
+    {% if auth %}
+    <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
+    {% else %}
     <li><a href="{{ url_for('auth.register') }}">Register</a>
     <li><a href="{{ url_for('auth.login') }}">Log In</a>
-      {% endif %}
+    {% endif %}
   </ul>
 </nav>
 <section class="content">
