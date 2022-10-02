@@ -37,6 +37,7 @@ def register():
         flash('Welcome to the Phonebook!')
         return redirect(url_for('auth.login'))
 
+    flash('Please, register')
     return render_template('auth/register.html', auth=user)
 
 

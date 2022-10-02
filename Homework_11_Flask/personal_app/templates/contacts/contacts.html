@@ -23,7 +23,6 @@
         </form>
     </div>
 
-    {{ g.username }}
     <div class="table-wrapper">
         <table class="table table-hover table-bordered">
             <thead>
@@ -33,10 +32,12 @@
                 <th>Surname</th>
                 <th>Email</th>
                 <th>Phone</th>
+<!--                <th>Update</th>-->
+                <th>Delete</th>
             </tr>
             </thead>
             <tbody>
-            {% for contact in contacts %}
+            {% for contact, phone in contacts %}
             <tr class="">
                 <td>{{ contact['contact_id'] }}</td>
                 <td class="">
@@ -44,12 +45,16 @@
                 </td>
                 <td>{{ contact['last_name']}}</td>
                 <td>{{ contact['email']}}</td>
-                <td>{{ contact['phone']}}</td>
+                <td>{{ phone['phone']}}</td>
+<!--                <td>-->
+<!--                    <form action="/contacts/update/{{contact.contact_id}}" method="post">-->
+<!--                        <button class="btn btn-success">Update</button>-->
+<!--                    </form>-->
+<!--                </td>-->
                 <td>
-                    <form action="/delete/{{contact.id}}" method="post">
+                    <form action="/contacts/delete/{{contact.contact_id}}" method="post">
                         <button class="btn btn-danger">Delete</button>
                     </form>
-                </td>
             </tr>
             {% endfor %}
             </tbody>

@@ -26,7 +26,7 @@ class Contact(db.Model):
     last_name = db.Column('last_name', db.String(50), nullable=False)
     email = db.Column('email', db.String(50), nullable=True, default='No email')
     user_id = db.Column(db.Integer, ForeignKey('users.id'), nullable=False)
-    phones = relationship("Phone", back_populates="contact", cascade="all, delete-orphan")
+    phones = relationship("Phone", back_populates="contact")
     user = relationship('User', cascade='all, delete', back_populates='contacts')
 
     @property
@@ -34,7 +34,7 @@ class Contact(db.Model):
         return f'{self.first_name} {self.last_name}'
 
     def __repr__(self):
-        return f"Contact({self.id}, {self.first_name},{self.last_name})"
+        return f"Contact({self.contact_id}, {self.first_name},{self.last_name}, {self.email})"
 
 
 class Phone(db.Model):
@@ -42,9 +42,9 @@ class Phone(db.Model):
     phone_id = db.Column('phone_id', db.Integer, primary_key=True)
     phone = db.Column('phone', db.String(50), nullable=True, default='No phone')
     contact_id = db.Column('contact_id', db.Integer, ForeignKey('contacts.contact_id'), nullable=False)
-    contact = relationship("Contact", back_populates="phones")
+    contact = relationship("Contact",cascade='all,delete', back_populates="phones")
 
     def __repr__(self):
-        return f"Phone({self.id}, {self.phone})"
+        return f"Phone({self.contact_id}, {self.phone})"
 
 
