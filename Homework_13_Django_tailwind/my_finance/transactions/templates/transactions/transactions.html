@@ -51,10 +51,14 @@
           aria-label="Default select example"
           name="category"
         >
-          <option selected>Open this select menu</option>
-          <option value="1">Food</option>
-          <option value="2">Car</option>
-          <option value="3">Present</option>
+          <option value="OTHER" selected>Open this select menu</option>
+          <option value="SALARY BONUS">Salary Bonus</option>
+          <option value="PRESENT">Present</option>
+          <option value="INVESTMENT">Investment</option>
+          <option value="RENT">Rent</option>
+          <option value="SAVINGS">Savings</option>
+          <option value="INTEREST">Interests</option>
+          <option value="SALES">Sales</option>
         </select>
       </div>
       <div class="form-group form-check text-center mb-6"></div>
@@ -69,7 +73,8 @@
 
   <div class="block p-6 rounded-lg shadow-lg bg-white max-w-md 1/2">
     <h2 class="mb-3 font-bold">EXPENSES</h2>
-    <form>
+    <form method="POST" action="{% url 'transactions:expenses' %}">
+        {% csrf_token %}
       <div class="grid grid-cols-2 gap-4">
         <div class="form-group mb-6">
           <label for="amount_exp" class="text-sm">Amount</label>
@@ -79,6 +84,7 @@
             id="amount_exp"
             aria-describedby="emailHelp123"
             placeholder="0"
+            name="amount_exp"
           />
         </div>
         <div class="form-group mb-6">
@@ -89,6 +95,7 @@
             id="date_exp"
             aria-describedby="emailHelp124"
             placeholder="Last name"
+            name="created_exp"
           />
         </div>
       </div>
@@ -101,17 +108,24 @@
           id="desc_exp"
           rows="3"
           placeholder="Comment"
+          name="description_exp"
         ></textarea>
       </div>
       <div class="form-group mb-6">
         <select
           class="form-select appearance-none block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
           aria-label="Default select example"
+            name="category_exp"
         >
-          <option selected>Open this select menu</option>
-          <option value="1">Food</option>
-          <option value="2">Car</option>
-          <option value="3">Present</option>
+          <option value="OTHER" selected>Open this select menu</option>
+          <option value="FOOD">Food</option>
+          <option value="CAR">Car</option>
+          <option value="PRESENT">Present</option>
+          <option value="CLOTHES">Clothes</option>
+          <option value="TRAVEL">Travel</option>
+          <option value="ENTERTAINMENT">Entertainment</option>
+          <option value="HEALTH">Health</option>
+          <option value="HOBBY">Hobby</option>
         </select>
       </div>
       <div class="form-group form-check text-center mb-6"></div>
