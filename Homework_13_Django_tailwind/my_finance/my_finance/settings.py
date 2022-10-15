@@ -36,9 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tailwind',
-    'theme',
+    'theme.apps.ThemeConfig',
     'django_browser_reload',
     'transactions.apps.TransactionsConfig',
+    'user.apps.UserConfig',
 ]
 
 MIDDLEWARE = [
