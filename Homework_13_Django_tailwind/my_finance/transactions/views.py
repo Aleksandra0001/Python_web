@@ -1,8 +1,7 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from django.utils.timezone import now
+from django.utils.timezone import now, timedelta
 from django.contrib import messages
 
 from .models import Income, Expense
@@ -95,3 +94,35 @@ def delete_expense_transaction(request, expense_id):
     expense = get_object_or_404(Expense, pk=expense_id, user=request.user)
     expense.delete()
     return redirect(reverse('transactions:statistics'))
+
+
+@login_required(login_url='auth:login')
+def filter_income_transaction(request):
+    if request.method == 'POST':
+        inc_date_from = request.POST.get('inc_date_from')
+        inc_date_to = request.POST.get('inc_date_to')
+        print(inc_date_from, inc_date_to)
+        if inc_date_from == '':
+            inc_date_from = now()-timedelta(days=365)
+        if inc_date_to == '':
+            inc_date_to = now()
+
+        incomes = Income.objects.filter(created_at__range=[inc_date_from, inc_date_to])
+        return render(request, "transactions/statistics.html", {'incomes': incomes})
+    return render(request, "transactions/statistics.html")
+
+
+@login_required(login_url='auth:login')
+def filter_expense_transaction(request):
+    if request.method == 'POST':
+        exp_date_from = request.POST.get('exp_date_from')
+        exp_date_to = request.POST.get('exp_date_to')
+        print(exp_date_from, exp_date_to)
+        if exp_date_from == '':
+            exp_date_from = now()-timedelta(days=365)
+        if exp_date_to == '':
+            exp_date_to = now()
+
+        expenses = Expense.objects.filter(created_at__range=[exp_date_from, exp_date_to])
+        return render(request, "transactions/statistics.html", {'expenses': expenses})
+    return render(request, "transactions/statistics.html")
