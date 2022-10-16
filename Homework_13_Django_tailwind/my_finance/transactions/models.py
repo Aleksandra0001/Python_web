@@ -17,7 +17,8 @@ class Income(models.Model):
     )
 
     def __str__(self):
-        return self.description, self.id  # noQA
+        return f"Owner: {self.user_id}, Income: {self.amount}, {self.created_at}, {self.description}, {self.category}"
+        # return self.description, self.id  # noQA
 
 
 class Expense(models.Model):
@@ -33,4 +34,5 @@ class Expense(models.Model):
     )
 
     def __str__(self):
-        return self.description, self.id  # noQA
+        return f"Owner: {self.user_id}, Expense: {self.amount}, {self.created_at}, {self.description}, {self.category}"
+        # return self.description, self.id  # noQA
