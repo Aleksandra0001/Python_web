@@ -21,9 +21,10 @@ class News(Base):
     img_url = Column(String(250), nullable=True)
     title = Column(String(150), nullable=False, unique=True)
     content = Column(String(2000), nullable=False)
-    date = Column(DateTime, nullable=False)
+    date = Column(String(50))
     created_at = Column(DateTime, default=datetime.now())
-    author = relationship("Author", secondary=news_to_author, backref="author")
+    author = relationship("Author", secondary=news_to_author, back_populates="news")
+    # author = relationship("Author", secondary=news_to_author, backref="author")
 
 
 class Author(Base):

@@ -32,4 +32,14 @@ class GetNewsSpider(scrapy.Spider):
             next_url = 'https://forklog.com/wp-content/themes/forklogv2/ajax/getPosts.php'
             load_more_btn = response.xpath('//div[@class="load_more_btn"]')
             if load_more_btn:
-                yield scrapy.FormRequest(url=next_url, callback=self.parse, formdata={'offset': '101', 'category': '1'})
+
+                offset = 34
+                while True and offset < 171:
+                    yield scrapy.FormRequest(
+                        url=next_url,
+                        formdata={'action': 'GetPostsByCategory', 'category': '1', 'offset': str(offset),
+                                  'postperpage': '34'},
+                    )
+                    offset += 34
+
+                # yield scrapy.FormRequest(url=next_url, callback=self.parse, formdata={'offset': '101', 'category': '1'})

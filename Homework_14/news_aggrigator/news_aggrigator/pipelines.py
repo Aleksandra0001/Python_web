@@ -16,7 +16,7 @@ class NewsAggrigatorPipeline:
         Base.metadata.create_all(engine)
         session = sessionmaker(bind=engine)()
         with session as db:
-        # Check if the news is already in the database
+            # Check if the news is already in the database
             if not db.query(News).filter_by(title=item['title']).first():
                 # If not, add it to the database
                 if item['author'] != 'Unknown':
@@ -27,13 +27,14 @@ class NewsAggrigatorPipeline:
                         db.commit()
                         print('Author added to the database')
 
+                author = db.query(Author).filter_by(name=item['author']).first()
                 news = News(
                     img_url=item['image'],
                     title=item['title'],
                     content=item['content'],
                     date=item['date'],
-                    author=item['author']
                 )
+                news.author.append(author)
                 db.add(news)
                 db.commit()
                 print('News added to the database')
