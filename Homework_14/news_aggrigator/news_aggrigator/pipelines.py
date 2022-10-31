@@ -6,29 +6,37 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
-from .db import session, engine
-from .models import News, Author
+from sqlalchemy.orm import sessionmaker
+from .db_config import engine
+from .models import News, Author, Base
 
 
 class NewsAggrigatorPipeline:
     def process_item(self, item, spider):
+        Base.metadata.create_all(engine)
+        session = sessionmaker(bind=engine)()
+        with session as db:
         # Check if the news is already in the database
-        if not session.query(News).filter_by(title=item['title']).first():
-            # If not, add it to the database
-            if item['author'] != 'Unknown':
-                author = session.query(Author).filter_by(name=item['author']).first()
-                if not author:
-                    author = Author(name=item['author'])
-                    session.add(author)
-                    session.commit()
+            if not db.query(News).filter_by(title=item['title']).first():
+                # If not, add it to the database
+                if item['author'] != 'Unknown':
+                    author = db.query(Author).filter_by(name=item['author']).first()
+                    if not author:
+                        author = Author(name=item['author'])
+                        db.add(author)
+                        db.commit()
+                        print('Author added to the database')
 
-            news = News(
-                img_url=item['image'],
-                title=item['title'],
-                content=item['content'],
-                date=item['date'],
-                author=item['author']
-            )
-            session.add(news)
-            session.commit()
+                news = News(
+                    img_url=item['image'],
+                    title=item['title'],
+                    content=item['content'],
+                    date=item['date'],
+                    author=item['author']
+                )
+                db.add(news)
+                db.commit()
+                print('News added to the database')
+
+        print('Item added to the database')
         return item

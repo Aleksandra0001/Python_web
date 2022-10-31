@@ -1,18 +1,17 @@
 from datetime import datetime
-
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import DateTime
 from sqlalchemy.sql.schema import ForeignKey, Table
-from .db import Base
+from sqlalchemy.ext.declarative import declarative_base
 
+Base = declarative_base()
 
-many_to_many = Table(
-    "many_to_many",
+news_to_author = Table(
+    "news_to_author",
     Base.metadata,
-    Column("news_id", Integer, ForeignKey("news.id")),
-    Column("author_id", Integer, ForeignKey("author.id")),
+    Column("news_id", Integer, ForeignKey("news.id"), primary_key=True),
+    Column("author_id", Integer, ForeignKey("author.id"), primary_key=True),
 )
 
 
@@ -24,7 +23,7 @@ class News(Base):
     content = Column(String(2000), nullable=False)
     date = Column(DateTime, nullable=False)
     created_at = Column(DateTime, default=datetime.now())
-    author = relationship("Author", secondary=many_to_many, backref="author")
+    author = relationship("Author", secondary=news_to_author, backref="author")
 
 
 class Author(Base):
@@ -32,3 +31,4 @@ class Author(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False, unique=True)
     created_at = Column(DateTime, default=datetime.now())
+    news = relationship("News", secondary=news_to_author, back_populates="author")

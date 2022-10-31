@@ -6,8 +6,11 @@ import json
 from datetime import datetime
 
 
-url = 'https://forklog.com/news'
-response = requests.get(url)
+base_url = 'https://forklog.com/news'
+response = requests.get(base_url)
+
+
+
 # soup = BeautifulSoup(response.text, 'lxml')
 soup = BeautifulSoup(response.text, 'html.parser')
 posts = soup.find_all('div', class_='post_item')
